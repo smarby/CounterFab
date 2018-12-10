@@ -21,7 +21,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':counterfab')
-    implementation "com.android.support:design:$supportLibraryVersion"
+    implementation "com.google.android.material:material:${materialVersion}"
 
     testImplementation "junit:junit:$junitVersion"
 
