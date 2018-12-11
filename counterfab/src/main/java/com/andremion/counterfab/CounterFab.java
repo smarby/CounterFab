@@ -30,17 +30,21 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.IntRange;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Property;
 import android.view.View;
 import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.stateful.ExtendableSavedState;
+
+import androidx.annotation.IntRange;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 
 /**
  * A {@link FloatingActionButton} subclass that shows a counter badge on right top corner.
@@ -288,88 +292,25 @@ public class CounterFab extends FloatingActionButton {
         }
     }
 
-    private static final class SavedState extends View.BaseSavedState {
-
-        private int count;
-
-        /**
-         * Constructor called from {@link CounterFab#onSaveInstanceState()}
-         */
-        private SavedState(@Nullable Parcelable superState) {
-            super(superState);
-        }
-
-        /**
-         * Constructor called from {@link #CREATOR}
-         */
-        private SavedState(Parcel in) {
-            super(in);
-            readState(in);
-        }
-
-        /**
-         * Constructor called from {@link #CREATOR}
-         */
-        @TargetApi(VERSION_CODES.N)
-        private SavedState(Parcel in, ClassLoader loader) {
-            super(in, loader);
-            readState(in);
-        }
-
-        private void readState(Parcel in) {
-            count = in.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(count);
-        }
-
-        @Override
-        public String toString() {
-            return CounterFab.class.getSimpleName() + '.' + SavedState.class.getSimpleName() + '{'
-                    + Integer.toHexString(System.identityHashCode(this))
-                    + " count=" + count + '}';
-        }
-
-        public static final Creator<SavedState> CREATOR = new ClassLoaderCreator<SavedState>() {
-
-            @Override
-            public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    return new SavedState(in, loader);
-                } else {
-                    return new SavedState(in);
-                }
-            }
-
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
-    }
-
     @Override
     public Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
-        ss.count = mCount;
-        return ss;
+        ExtendableSavedState state = new ExtendableSavedState(superState);
+        Bundle bundle = new Bundle();
+        bundle.putInt("count", mCount);
+        state.extendableStates.put("fab_counter", bundle);
+        return state;
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        SavedState ss = (SavedState) state;
-        super.onRestoreInstanceState(ss.getSuperState());
-        setCount(ss.count);
-        requestLayout();
+        ExtendableSavedState ess = (ExtendableSavedState) state;
+        super.onRestoreInstanceState(ess.getSuperState());
+        Bundle bundle = ess.extendableStates.get("fab_counter");
+        if (bundle != null) {
+            setCount(bundle.getInt("count"));
+            requestLayout();
+        }
     }
 
 }

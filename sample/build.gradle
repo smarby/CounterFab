@@ -22,6 +22,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':counterfab')
     implementation "com.google.android.material:material:${materialVersion}"
+    implementation "androidx.appcompat:appcompat:${appcompatVersion}"
 
     testImplementation "junit:junit:$junitVersion"
 
